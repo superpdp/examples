@@ -32,7 +32,7 @@ let config = {
 }
 
 // Obtention d'un access token oauth2 pour les appels à l'API du vendeur
-const seller_token = await fetch(`${config.endpoint  }/oauth2/token`, {
+const seller_token = await fetch(`${config.endpoint}/oauth2/token`, {
   method: "POST",
   headers: {
     "Content-Type": "application/x-www-form-urlencoded",
@@ -59,7 +59,7 @@ const seller_headers = {
 console.log("Token oauth2 vendeur obtenu")
 
 // Obtention d'un token oauth2 pour les appels à l'API de l'acheteur
-const buyer_token = await fetch(`${config.endpoint  }/oauth2/token`, {
+const buyer_token = await fetch(`${config.endpoint}/oauth2/token`, {
   method: "POST",
   headers: {
     "Content-Type": "application/x-www-form-urlencoded",
@@ -86,7 +86,7 @@ const buyer_headers = {
 console.log("Token oauth2 acheteur obtenu")
 
 // Vérification du nom de l'entreprise associée au token vendeur
-const seller_company = await fetch(`${config.endpoint  }/v1.beta/companies/me`, {
+const seller_company = await fetch(`${config.endpoint}/v1.beta/companies/me`, {
   headers: seller_headers,
 }).then((resp) => {
   if (resp.status !== 200) {
@@ -98,9 +98,12 @@ const seller_company = await fetch(`${config.endpoint  }/v1.beta/companies/me`, 
 console.log(`Dénomination du vendeur : ${seller_company.formal_name}`)
 
 // Téléchargement d'une facture de test qui est prête à être envoyée du vendeur à l'acheteur
-const seller_invoice = await fetch(`${config.endpoint  }/v1.beta/invoices/generate_test_invoice?format=ubl`, {
-  headers: seller_headers,
-}).then((resp) => {
+const seller_invoice = await fetch(
+  `${config.endpoint}/v1.beta/invoices/generate_test_invoice?format=ubl`,
+  {
+    headers: seller_headers,
+  },
+).then((resp) => {
   if (resp.status !== 200) {
     throw new Error(`http ${resp.status}`)
   }
@@ -112,10 +115,13 @@ console.log("Facture de test téléchargée")
 // Validation de la facture
 let form_data = new FormData()
 form_data.append("file", seller_invoice)
-const validation_report = await fetch(`${config.endpoint  }/v1.beta/validation_reports`, {
-  method: "POST",
-  body: form_data,
-}).then((resp) => {
+const validation_report = await fetch(
+  `${config.endpoint}/v1.beta/validation_reports`,
+  {
+    method: "POST",
+    body: form_data,
+  },
+).then((resp) => {
   if (resp.status !== 200) {
     throw new Error(`http ${resp.status}`)
   }
@@ -125,7 +131,7 @@ const validation_report = await fetch(`${config.endpoint  }/v1.beta/validation_r
 console.log(`Résultat de la validation : ${validation_report.data[0].is_valid}`)
 
 // Sauvegarde du dernier id de facture acheteur
-const list = await fetch(`${config.endpoint  }/v1.beta/invoices?order=desc`, {
+const list = await fetch(`${config.endpoint}/v1.beta/invoices?order=desc`, {
   headers: buyer_headers,
 }).then((resp) => {
   if (resp.status !== 200) {
@@ -139,7 +145,7 @@ if (list.data.length > 0) {
 }
 
 // Envoi de la facture
-const uploaded = await fetch(`${config.endpoint  }/v1.beta/invoices`, {
+const uploaded = await fetch(`${config.endpoint}/v1.beta/invoices`, {
   method: "POST",
   headers: seller_headers,
   body: seller_invoice,
@@ -161,9 +167,12 @@ let intervalId = setInterval(async () => {
   i += 1
 
   // Liste des factures acheteur
-  const list = await fetch(`${config.endpoint  }/v1.beta/invoices?starting_after_id=${maxId}`, {
-    headers: buyer_headers,
-  }).then((resp) => {
+  const list = await fetch(
+    `${config.endpoint}/v1.beta/invoices?starting_after_id=${maxId}`,
+    {
+      headers: buyer_headers,
+    },
+  ).then((resp) => {
     if (resp.status !== 200) {
       throw new Error(`http ${resp.status}`)
     }
