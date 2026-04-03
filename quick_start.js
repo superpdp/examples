@@ -20,6 +20,7 @@ Ce script effectue les actions suivantes :
 5. Validation de la facture côté vendeur
 6. Envoi de la facture côté vendeur
 7. Attente et affichage de la facture reçue côté acheteur
+8. Envoi du statut "Encaissée" côté vendeur
 */
 
 // Configuration à compléter avec identifiants des applications oauth créées sur SUPER PDP
@@ -78,7 +79,7 @@ const buyer_token = await fetch(`${config.endpoint}/oauth2/token`, {
   })
   .then((body) => body.access_token)
 
-// Headers HTTP que nous allons réutiliser dans les appels à l'API pour s'authentifier en tant que vendeur
+// Headers HTTP que nous allons réutiliser dans les appels à l’API pour s'authentifier en tant qu'acheteur
 const buyer_headers = {
   Authorization: `Bearer ${buyer_token}`,
 }
@@ -180,7 +181,56 @@ let intervalId = setInterval(async () => {
   })
 
   if (list.data.length > 0) {
-    console.log("Facture reçue !")
+    console.log("Facture reçue !")
     clearInterval(intervalId)
   }
 }, 1000)
+
+// Attente du traitement de la facture
+for (let i = 0; i < 10; i++) {
+  const invoice = await fetch(
+    `${config.endpoint}/v1.beta/invoices/${uploaded.id}`,
+    { headers: seller_headers },
+  ).then((resp) => resp.json())
+
+  if (invoice.en_invoice) {
+    console.log("Facture traitée")
+    break
+  }
+
+  await new Promise((r) => setTimeout(r, 500))
+}
+
+// Envoi du statut Encaissée
+const resp = await fetch(`${config.endpoint}/v1.beta/invoice_events`, {
+  headers: seller_headers,
+  method: "POST",
+  body: JSON.stringify({
+    invoice_id: uploaded.id,
+    status_code: "fr:212",
+    details: [
+      {
+        amounts: [
+          {
+            net_amount: "1800.00",
+            currency_code: "EUR",
+            type_code: "MEN",
+            vat_rate: "20.0",
+            date: "2026-03-31",
+          },
+          {
+            net_amount: "63.79",
+            currency_code: "EUR",
+            type_code: "MEN",
+            vat_rate: "5.5",
+            date: "2026-03-31",
+          },
+        ],
+      },
+    ],
+  }),
+})
+
+if (resp.ok) {
+  console.log("Statut encaissée envoyé !")
+}
