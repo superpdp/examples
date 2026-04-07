@@ -156,5 +156,7 @@ validation_report = await fetch(
   }
   return resp.json()
 })
-
 console.log(`Résultat de la validation : ${validation_report.data[0].is_valid}`)
+
+fs.writeFileSync("facturx.pdf", Buffer.from(facturX))
+console.log("Factur-X sauvegardée sous facturx.pdf")
