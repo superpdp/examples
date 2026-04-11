@@ -9,7 +9,9 @@ en OAuth 2.0 avec le flow "Authorization Code".
 Prérequis :
 
 - Se créer un compte gratuit sur <https://www.superpdp.tech>
-- Installer go sur sa machine
+- Installer go (version >= 1.22) sur sa machine. Les versions antérieures
+  compilent le fichier sans erreur mais ne matchent aucune route à l'exécution
+  (la syntaxe "GET /" utilisée par http.HandleFunc nécessite Go 1.22+).
 - Adapter la configuration ci-dessous avec vos valeurs de ClientId et ClientSecret
 
 Commande à exécuter la première fois uniquement :
