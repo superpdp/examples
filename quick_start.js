@@ -210,19 +210,19 @@ const resp = await fetch(`${config.endpoint}/v1.beta/invoice_events`, {
     status_code: "fr:212",
     details: [
       {
-        amounts: [
+        reported_data: [
           {
-            net_amount: "1800.00",
+            amount: "1800.00",
             currency_code: "EUR",
             type_code: "MEN",
-            vat_rate: "20.0",
+            value_percent: "20.0",
             date: "2026-03-31",
           },
           {
-            net_amount: "63.79",
+            amount: "63.79",
             currency_code: "EUR",
             type_code: "MEN",
-            vat_rate: "5.5",
+            value_percent: "5.5",
             date: "2026-03-31",
           },
         ],
